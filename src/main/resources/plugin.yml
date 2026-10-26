@@ -1,0 +1,24 @@
+name: Snitch
+version: 1.0.0
+api-version: 26.1
+main: dev.jstus.snitch.Snitch
+paper-plugin-loader: dev.jstus.snitch.SnitchLoader
+folia-supported: true
+authors: [Justus]
+
+permissions:
+  snitch.report:
+    description: File a report with /reportcheating
+    default: true
+  snitch.command:
+    description: Grants every /snitch subcommand
+    default: op
+    children:
+      snitch.menu: true
+      snitch.resolvecase: true
+  snitch.menu:
+    description: Open the case overview with /snitch menu
+    default: op
+  snitch.resolvecase:
+    description: Resolve a case with /snitch resolvecase
+    default: op

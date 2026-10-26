@@ -1,0 +1,41 @@
+[versions]
+paper-api = "26.1.2.build.74-stable"
+lombok = "1.18.46"
+run-paper = "3.0.2"
+invui = "2.1.1"
+cloud = "2.1.0"
+cloud-minecraft = "2.0.0"
+jooq = "3.21.6"
+flyway = "13.1.0"
+postgresql = "42.7.13"
+hikari = "7.1.0"
+configlib = "4.8.1"
+guice = "7.0.0"
+caffeine = "3.2.4"
+
+[libraries]
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+invui = { group = "xyz.xenondevs.invui", name = "invui", version.ref = "invui" }
+
+# Cloud v2 command framework
+cloud-core = { group = "org.incendo", name = "cloud-core", version.ref = "cloud" }
+cloud-paper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloud-minecraft" }
+cloud-minecraft-extras = { group = "org.incendo", name = "cloud-minecraft-extras", version.ref = "cloud-minecraft" }
+
+# Persistence
+jooq = { group = "org.jooq", name = "jooq", version.ref = "jooq" }
+jooq-meta-extensions = { group = "org.jooq", name = "jooq-meta-extensions", version.ref = "jooq" }
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
+flyway-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flyway" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
+
+# Config & DI
+configlib-paper = { group = "de.exlll", name = "configlib-paper", version.ref = "configlib" }
+guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+
+[plugins]
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+jooq-codegen = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
