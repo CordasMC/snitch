@@ -51,6 +51,13 @@ also supported.
 
 But honestly: please just use postgres.
 
+## Design Decisions
+
+1. No hot-reloading
+Snitch does not support hot-reloading via command. This is a deliberate decision. I view hot-reloading as an anti-pattern that, in modern containerized environments, is useless.
+2. Limited customization
+Some things are customizable, but the core behavior is not. This plugin isn't trying to be anything more than a triaging system.
+
 ## To-Do
 
 - Notifications?

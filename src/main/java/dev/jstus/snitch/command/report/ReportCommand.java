@@ -4,13 +4,14 @@ import com.google.inject.Inject;
 import dev.jstus.snitch.command.CommandClass;
 import dev.jstus.snitch.command.SnitchCommand;
 import dev.jstus.snitch.command.suggestion.OnlinePlayerSuggestions;
+import dev.jstus.snitch.config.impl.MessageConfig;
+import dev.jstus.snitch.message.resolvers.ReportResolver;
 import dev.jstus.snitch.report.ReportResult;
 import dev.jstus.snitch.report.ReportService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.context.CommandContext;
@@ -22,6 +23,8 @@ import org.incendo.cloud.parser.standard.StringParser;
 public class ReportCommand implements SnitchCommand {
 
     private final ReportService reports;
+    private final MiniMessage mm;
+    private final MessageConfig msg;
 
     @Override
     public void register(PaperCommandManager<CommandSourceStack> manager) {
@@ -34,38 +37,33 @@ public class ReportCommand implements SnitchCommand {
 
     private CompletableFuture<Void> handle(CommandContext<CommandSourceStack> context) {
         if (!(context.sender().getExecutor() instanceof Player player)) {
-            context.sender().getSender().sendMessage(
-                    Component.text("Only players can report.", NamedTextColor.RED));
+            context.sender().getSender().sendMessage(mm.deserialize(msg.getReportOnlyPlayers()));
             return CompletableFuture.completedFuture(null);
         }
 
         String reason = context.<String>optional("reason").orElse(null);
         if (reason != null && reason.length() > 255) {
-            context.sender().getSender().sendMessage(Component.text("The provided reason is too long ( chill out there mate )!", NamedTextColor.RED));
+            context.sender().getSender().sendMessage(mm.deserialize(msg.getReportReasonTooLong()));
             return CompletableFuture.completedFuture(null);
         }
 
         String name = context.get("player");
         Player target = Bukkit.getPlayerExact(name);
         if (target == null) {
-            player.sendMessage(Component.text(name + " is not online.", NamedTextColor.RED));
+            player.sendMessage(mm.deserialize(msg.getReportTargetOffline(), new ReportResolver(name)));
             return CompletableFuture.completedFuture(null);
         }
 
         return reports.report(player.getUniqueId(), target.getUniqueId(), reason)
-                .thenAccept(result -> notifyResult(player, target, result));
+                .thenAccept(result -> notifyResult(result, player, new ReportResolver(target.getName())));
     }
 
-    private void notifyResult(Player player, Player target, ReportResult result) {
+    private void notifyResult(ReportResult result, Player player, ReportResolver tagResolver) {
         switch (result.outcome()) {
-            case REPORTED -> player.sendMessage(
-                    Component.text("Reported " + target.getName() + ".", NamedTextColor.GREEN));
-            case ALREADY_REPORTED -> player.sendMessage(
-                    Component.text("You already reported " + target.getName() + ".", NamedTextColor.RED));
-            case SELF -> player.sendMessage(
-                    Component.text("You cannot report yourself.", NamedTextColor.RED));
-            case ERROR -> player.sendMessage(
-                    Component.text("An error occurred submitting the report.", NamedTextColor.RED));
+            case REPORTED -> player.sendMessage(mm.deserialize(msg.getReportSuccess(), tagResolver));
+            case ALREADY_REPORTED -> player.sendMessage(mm.deserialize(msg.getReportAlreadyReported(), tagResolver));
+            case SELF -> player.sendMessage(mm.deserialize(msg.getReportSelf(), tagResolver));
+            case ERROR -> player.sendMessage(mm.deserialize(msg.getReportError(), tagResolver));
         }
     }
 }
