@@ -5,6 +5,7 @@ main: dev.jstus.snitch.Snitch
 paper-plugin-loader: dev.jstus.snitch.SnitchLoader
 folia-supported: true
 authors: [Justus]
+softdepend: [LiteBans]
 
 permissions:
   snitch.report:

@@ -60,7 +60,7 @@ public class ReportCommand implements SnitchCommand {
 
     private void notifyResult(ReportResult result, Player player, ReportResolver tagResolver) {
         switch (result.outcome()) {
-            case REPORTED -> player.sendMessage(mm.deserialize(msg.getReportSuccess(), tagResolver));
+            case REPORTED, SILENT_DENIAL_ALT_PREVENTION, SILENT_DENIAL_SHADOW_BANNED -> player.sendMessage(mm.deserialize(msg.getReportSuccess(), tagResolver));
             case ALREADY_REPORTED -> player.sendMessage(mm.deserialize(msg.getReportAlreadyReported(), tagResolver));
             case SELF -> player.sendMessage(mm.deserialize(msg.getReportSelf(), tagResolver));
             case ERROR -> player.sendMessage(mm.deserialize(msg.getReportError(), tagResolver));

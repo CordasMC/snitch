@@ -1,9 +1,14 @@
 package dev.jstus.snitch.report;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import dev.jstus.snitch.config.impl.AltDetectionConfig;
 import dev.jstus.snitch.report.alting.AltDetectionService;
+import dev.jstus.snitch.report.alting.LiteBansAltDetectionService;
 import dev.jstus.snitch.report.alting.PlaytimeAltDetectionService;
+import org.bukkit.Bukkit;
 import dev.jstus.snitch.trust.JooqTrustScoreRepository;
 import dev.jstus.snitch.trust.TrustScoreRepository;
 import dev.jstus.snitch.trust.TrustScoreService;
@@ -18,6 +23,21 @@ public final class ReportModule extends AbstractModule {
         bind(TrustScoreRepository.class).to(JooqTrustScoreRepository.class).in(Singleton.class);
         bind(ReportCaseRepository.class).to(JooqReportCaseRepository.class).in(Singleton.class);
         bind(ReportRepository.class).to(JooqReportRepository.class).in(Singleton.class);
-        bind(AltDetectionService.class).to(PlaytimeAltDetectionService.class).asEagerSingleton();
+    }
+
+    @Provides
+    @Singleton
+    AltDetectionService altDetectionService(AltDetectionConfig config,
+                                            Provider<PlaytimeAltDetectionService> playtime,
+                                            Provider<LiteBansAltDetectionService> liteBans) {
+        return switch (config.getDetectionMethod()) {
+            case PLAYTIME -> playtime.get();
+            case LITEBANS -> {
+                if (!Bukkit.getPluginManager().isPluginEnabled("LiteBans")) {
+                    throw new IllegalStateException("Alt detection method is LITEBANS, but LiteBans is not enabled");
+                }
+                yield liteBans.get();
+            }
+        };
     }
 }

@@ -12,6 +12,7 @@ hikari = "7.1.0"
 configlib = "4.8.1"
 guice = "7.0.0"
 caffeine = "3.2.4"
+litebans-api = "0.6.1"
 
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
@@ -35,6 +36,9 @@ hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
 configlib-paper = { group = "de.exlll", name = "configlib-paper", version.ref = "configlib" }
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+
+# Integrations
+litebans-api = { group = "com.gitlab.ruany", name = "LiteBansAPI", version.ref = "litebans-api" }
 
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

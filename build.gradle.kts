@@ -18,6 +18,9 @@ repositories {
 
     // InvUI
     maven("https://repo.xenondevs.xyz/releases")
+
+    // LiteBans API
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -44,6 +47,9 @@ dependencies {
     compileOnly(libs.configlib.paper)
     compileOnly(libs.guice)
     compileOnly(libs.caffeine)
+
+    // Provided by the LiteBans plugin
+    compileOnly(libs.litebans.api)
 
     // Code generation reads the Flyway migrations, no live database required
     jooqCodegen(libs.jooq.meta.extensions)
