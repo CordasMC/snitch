@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import dev.jstus.snitch.config.impl.ReportConfig;
 import dev.jstus.snitch.db.DatabaseExecutor;
 import dev.jstus.snitch.db.TransactionalOrchestrator;
+import dev.jstus.snitch.report.alting.AltDetectionService;
+import dev.jstus.snitch.report.alting.ReportAltDetectionVerdict;
 import dev.jstus.snitch.trust.TrustScoreRepository;
 import java.time.Instant;
 import java.util.HashMap;
@@ -31,11 +33,12 @@ public class ReportService {
     private final ExecutorService executor;
     private final TransactionalOrchestrator orchestrator;
     private final Logger logger;
+    private final AltDetectionService altPrevention;
 
     @Inject
     public ReportService(ReportCaseRepository cases, ReportRepository reports, TrustScoreRepository trust,
                          Provider<ReportConfig> config, @DatabaseExecutor ExecutorService executor,
-                         TransactionalOrchestrator orchestrator, Logger logger) {
+                         TransactionalOrchestrator orchestrator, Logger logger, AltDetectionService altPrevention) {
         this.cases = cases;
         this.reports = reports;
         this.trust = trust;
@@ -43,6 +46,7 @@ public class ReportService {
         this.executor = executor;
         this.orchestrator = orchestrator;
         this.logger = logger;
+        this.altPrevention = altPrevention;
     }
 
     public CompletableFuture<ReportResult> report(UUID reporter, UUID reported, @Nullable String reason) {
@@ -50,7 +54,11 @@ public class ReportService {
             return CompletableFuture.completedFuture(ReportResult.self());
         }
 
-        return async(() -> fileReportTransactional(reporter, reported, reason));
+        return async(() -> cases.findOpen(reported).orElse(null))
+                .thenCompose(open -> altPrevention.shouldAllowReport(reporter, open))
+                .thenCompose(verdict -> verdict == ReportAltDetectionVerdict.DENY
+                        ? CompletableFuture.completedFuture(ReportResult.altPrevented())
+                        : async(() -> fileReportTransactional(reporter, reported, reason)));
     }
 
     private ReportResult fileReportTransactional(UUID reporter, UUID reported, @Nullable String reason) {
