@@ -13,6 +13,8 @@ import dev.jstus.snitch.trust.JooqTrustScoreRepository;
 import dev.jstus.snitch.trust.TrustScoreRepository;
 import dev.jstus.snitch.trust.TrustScoreService;
 
+import java.util.logging.Logger;
+
 public final class ReportModule extends AbstractModule {
 
     @Override
@@ -29,12 +31,14 @@ public final class ReportModule extends AbstractModule {
     @Singleton
     AltDetectionService altDetectionService(AltDetectionConfig config,
                                             Provider<PlaytimeAltDetectionService> playtime,
-                                            Provider<LiteBansAltDetectionService> liteBans) {
+                                            Provider<LiteBansAltDetectionService> liteBans,
+                                            Provider<Logger> logger) {
         return switch (config.getDetectionMethod()) {
             case PLAYTIME -> playtime.get();
             case LITEBANS -> {
                 if (!Bukkit.getPluginManager().isPluginEnabled("LiteBans")) {
-                    throw new IllegalStateException("Alt detection method is LITEBANS, but LiteBans is not enabled");
+                    logger.get().warning("Alt Detection method was LiteBans, but LiteBans is not installed. Falling back to Playtime.");
+                    yield playtime.get();
                 }
                 yield liteBans.get();
             }
