@@ -72,6 +72,7 @@ public class ReportService {
 
                 double weight = this.trust.with(tx).find(reporter).orElse(config.getBaseTrustScore());
 
+                // We get the case again, this time locking it, to prevent a lost update occurring
                 ReportCase open = cases.findOpenForUpdate(reported).orElse(null);
                 if (open == null) {
                     long caseId = cases.create(reported, weight, now);

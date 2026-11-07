@@ -70,6 +70,10 @@ Depending on if people actually find the idea interesting, I may or may not main
 
 If you have any contributions to make, please feel free to open a PR :) - Just don't break my entire code-style please, thanks!
 
+## Credit
+
+Thanks to @mcmdev for providing some code-style insight & suggesting improvements to the initial version!!
+
 ## License
 
 [AGPL-3.0](LICENSE)
