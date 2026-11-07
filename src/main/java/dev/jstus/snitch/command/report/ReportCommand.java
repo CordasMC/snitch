@@ -10,8 +10,11 @@ import dev.jstus.snitch.report.ReportResult;
 import dev.jstus.snitch.report.ReportService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.context.CommandContext;
@@ -25,6 +28,7 @@ public class ReportCommand implements SnitchCommand {
     private final ReportService reports;
     private final MiniMessage mm;
     private final MessageConfig msg;
+    private final Logger logger;
 
     @Override
     public void register(PaperCommandManager<CommandSourceStack> manager) {
@@ -60,10 +64,22 @@ public class ReportCommand implements SnitchCommand {
 
     private void notifyResult(ReportResult result, Player player, ReportResolver tagResolver) {
         switch (result.outcome()) {
-            case REPORTED, SILENT_DENIAL_ALT_PREVENTION, SILENT_DENIAL_SHADOW_BANNED -> player.sendMessage(mm.deserialize(msg.getReportSuccess(), tagResolver));
+            case REPORTED -> notifyPlayerSuccess(player, tagResolver);
+            case SILENT_DENIAL_ALT_PREVENTION -> {
+                notifyPlayerSuccess(player, tagResolver);
+                logger.info(player.getName() + "'s report was silently ignored because they were detected as an alt-account. See the configuration file as for how to modify this behaviour.");
+            }
+            case SILENT_DENIAL_SHADOW_BANNED -> {
+                notifyPlayerSuccess(player, tagResolver);
+                logger.info(player.getName() + "'s report was silently ignored because they are shadow-banned.");
+            }
             case ALREADY_REPORTED -> player.sendMessage(mm.deserialize(msg.getReportAlreadyReported(), tagResolver));
             case SELF -> player.sendMessage(mm.deserialize(msg.getReportSelf(), tagResolver));
             case ERROR -> player.sendMessage(mm.deserialize(msg.getReportError(), tagResolver));
         }
+    }
+
+    private void notifyPlayerSuccess(Player player, TagResolver resolver) {
+        player.sendMessage(mm.deserialize(msg.getReportSuccess(), resolver));
     }
 }

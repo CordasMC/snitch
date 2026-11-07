@@ -27,4 +27,11 @@ public class MessageConfig {
     private String resolveCaseNoOpenCase = "<prefix><red><target> has no open case.</red>";
     private String resolveCaseError = "<prefix><red>An error occurred resolving the case.</red>";
     private String menuOnlyPlayers = "<prefix><red>Only players can open the menu.</red>";
+
+    private String shadowBanTargetNotFound = "<prefix><red>Target <target> not found.</red>";
+    private String shadowBanAdded = "<prefix><green>Shadow banned <target>.</green>";
+    private String shadowBanRemoved = "<prefix><green>Removed the shadow ban on <target>.</green>";
+    private String shadowBanAlreadyBanned = "<prefix><red><target> is already shadow banned.</red>";
+    private String shadowBanNotBanned = "<prefix><red><target> is not shadow banned.</red>";
+    private String shadowBanError = "<prefix><red>An error occurred updating the shadow ban.</red>";
 }

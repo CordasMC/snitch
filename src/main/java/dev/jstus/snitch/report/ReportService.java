@@ -8,6 +8,7 @@ import dev.jstus.snitch.db.DatabaseExecutor;
 import dev.jstus.snitch.db.TransactionalOrchestrator;
 import dev.jstus.snitch.report.alting.AltDetectionService;
 import dev.jstus.snitch.report.alting.ReportAltDetectionVerdict;
+import dev.jstus.snitch.shadowban.ShadowBanService;
 import dev.jstus.snitch.trust.TrustScoreRepository;
 import java.time.Instant;
 import java.util.HashMap;
@@ -34,11 +35,13 @@ public class ReportService {
     private final TransactionalOrchestrator orchestrator;
     private final Logger logger;
     private final AltDetectionService altPrevention;
+    private final ShadowBanService shadowBanService;
 
     @Inject
     public ReportService(ReportCaseRepository cases, ReportRepository reports, TrustScoreRepository trust,
                          Provider<ReportConfig> config, @DatabaseExecutor ExecutorService executor,
-                         TransactionalOrchestrator orchestrator, Logger logger, AltDetectionService altPrevention) {
+                         TransactionalOrchestrator orchestrator, Logger logger, AltDetectionService altPrevention,
+                         ShadowBanService shadowBanService) {
         this.cases = cases;
         this.reports = reports;
         this.trust = trust;
@@ -47,6 +50,7 @@ public class ReportService {
         this.orchestrator = orchestrator;
         this.logger = logger;
         this.altPrevention = altPrevention;
+        this.shadowBanService = shadowBanService;
     }
 
     public CompletableFuture<ReportResult> report(UUID reporter, UUID reported, @Nullable String reason) {
@@ -54,6 +58,13 @@ public class ReportService {
             return CompletableFuture.completedFuture(ReportResult.self());
         }
 
+        return shadowBanService.isShadowBanned(reporter)
+                .thenCompose(shadowBanned -> shadowBanned
+                        ? CompletableFuture.completedFuture(ReportResult.shadowBanned())
+                        : fileReport(reporter, reported, reason));
+    }
+
+    private CompletableFuture<ReportResult> fileReport(UUID reporter, UUID reported, @Nullable String reason) {
         return async(() -> cases.findOpen(reported).orElse(null))
                 .thenCompose(open -> altPrevention.shouldAllowReport(reporter, open))
                 .thenCompose(verdict -> verdict == ReportAltDetectionVerdict.DENY

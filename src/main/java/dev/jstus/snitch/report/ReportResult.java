@@ -15,6 +15,10 @@ public record ReportResult(Outcome outcome, double riskScore) {
         return new ReportResult(Outcome.REPORTED, riskScore);
     }
 
+    public static ReportResult shadowBanned() {
+        return new ReportResult(Outcome.SILENT_DENIAL_SHADOW_BANNED, 0);
+    }
+
     public static ReportResult altPrevented() {
         return new ReportResult(Outcome.SILENT_DENIAL_ALT_PREVENTION, 0);
     }

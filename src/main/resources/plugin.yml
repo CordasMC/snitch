@@ -17,9 +17,13 @@ permissions:
     children:
       snitch.menu: true
       snitch.resolvecase: true
+      snitch.shadowban: true
   snitch.menu:
     description: Open the case overview with /snitch menu
     default: op
   snitch.resolvecase:
     description: Resolve a case with /snitch resolvecase
+    default: op
+  snitch.shadowban:
+    description: Add or remove a shadow ban with /snitch shadowban
     default: op

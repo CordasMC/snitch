@@ -31,6 +31,7 @@ triage-work.
 | `/reportcheating <player> [reason]`              | `snitch.report`      | everyone |     |
 | `/snitch menu`                                   | `snitch.menu`        | op       |     |
 | `/snitch resolvecase <player> <cheating\|legit>` | `snitch.resolvecase` | op       |     |
+| `/snitch shadowban <add\|remove> <player>`       | `snitch.shadowban`   | op       |     |
 
 `snitch.command` grants all `/snitch` subcommands.
 
